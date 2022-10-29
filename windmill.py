@@ -32,12 +32,7 @@ class WindmillScene(Scene):
         ]:
             self.play(Create(mob))
         animations,run_time=self.rotate_next_pivot(windmill)
-        self.let_windmill_run(windmill,24)
-        for i in range(len(animations)):
-            if i>15:
-                animations[i].set_stroke(color=RED)
-            elif i>15:
-                animations[i].set_stroke(color=BLUE)
+        self.let_windmill_run(windmill,4)
         self.play(*animations)
         self.wait()
     def get_random_point_set(self, n_points=11, width=6, height=6):
