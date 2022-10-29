@@ -31,9 +31,14 @@ class WindmillScene(Scene):
             *dots_non_pivot[-1],
         ]:
             self.play(Create(mob))
-        run_time=self.rotate_next_pivot(windmill)
-        self.let_windmill_run(windmill,4)
-        next_pivot, angle=self.next_pivot_and_angle(windmill)
+        animations,run_time=self.rotate_next_pivot(windmill)
+        self.let_windmill_run(windmill,24)
+        for i in range(len(animations)):
+            if i>15:
+                animations[i].set_stroke(color=RED)
+            elif i>15:
+                animations[i].set_stroke(color=BLUE)
+        self.play(*animations)
         self.wait()
     def get_random_point_set(self, n_points=11, width=6, height=6):
         return np.array([
@@ -117,13 +122,21 @@ class WindmillScene(Scene):
             changle_pivot_at_end=False
         else:
             rate_func=linear
+        for anim in added_anims:
+            if anim.run_time>run_time:
+                anim.run_time=run_time
+                self.play(anim,run_time=run_time)
         self.play(Rotate(windmill,angle=-angle,rate_func=rate_func,run_time=run_time))
         if changle_pivot_at_end:
             self.handle_pivot_change(windmill,new_pivot)
-        return run_time
+        return [self.get_hit_square(windmill.pivot)],run_time
     def handle_pivot_change(self,windmill,new_pivot):
         windmill.pivot=new_pivot
     def let_windmill_run(self,windmill,time):
+        animations=[]
         while time>0:
-            last_run_time=self.rotate_next_pivot(windmill,time)
+            animations,last_run_time=self.rotate_next_pivot(windmill,max_time=time,added_anims=animations)
             time-=last_run_time
+    def get_hit_square(self,point):
+        square=Square().move_to(point)
+        return Create(square)
